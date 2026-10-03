@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Papa from 'papaparse';
-import { DEFAULT_LOCATION, DEFAULT_REORDER_POINT } from './utils/inventoryUtils.js';
-import { useDialogAccessibility } from './hooks/useDialogAccessibility.js';
+import { DEFAULT_LOCATION, DEFAULT_REORDER_POINT } from '../utils/inventoryUtils.js';
+import { useDialogAccessibility } from '../hooks/useDialogAccessibility.js';
 
 const normalizeHeader = (header) => header.trim().toLowerCase().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ');
 

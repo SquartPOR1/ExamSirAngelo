@@ -5,7 +5,7 @@ import SearchBar from './SearchBar.jsx';
 import FilterBar from './FilterBar.jsx';
 import Dashboard from './Dashboard.jsx';
 import ActivityHistory from './ActivityHistory.jsx';
-import DataManagement from './DataManagement.jsx';
+import DataManagement from './components/DataManagement.jsx';
 import StockMovementDialog from './StockMovementDialog.jsx';
 import BulkActions from './BulkActions.jsx';
 import CatalogManager from './CatalogManager.jsx';
@@ -21,18 +21,7 @@ import {
   normalizeProduct,
   normalizeProducts
 } from './utils/inventoryUtils.js';
-
-function readStoredArray(key, fallback) {
-  try {
-    const savedValue = localStorage.getItem(key);
-    if (!savedValue) return fallback;
-    const parsedValue = JSON.parse(savedValue);
-    return Array.isArray(parsedValue) ? parsedValue : fallback;
-  } catch (error) {
-    console.error(`Failed to read ${key}:`, error);
-    return fallback;
-  }
-}
+import { readStoredArray, writeStoredValue } from './utils/localStorage.js';
 
 const getDefaultProducts = () => [
   {
@@ -99,17 +88,7 @@ function App() {
   const [suppliers, setSuppliers] = useState(() => readStoredArray('inventorySuppliers', []));
   const [movements, setMovements] = useState(() => readStoredArray('inventoryMovements', []));
   const [purchaseOrders, setPurchaseOrders] = useState(() => readStoredArray('inventoryPurchaseOrders', []));
-  const [activity, setActivity] = useState(() => {
-    const savedActivity = localStorage.getItem('inventoryActivity');
-    if (!savedActivity) return [];
-    try {
-      const parsedActivity = JSON.parse(savedActivity);
-      return Array.isArray(parsedActivity) ? parsedActivity : [];
-    } catch (error) {
-      console.error('Failed to parse saved activity:', error);
-      return [];
-    }
-  });
+  const [activity, setActivity] = useState(() => readStoredArray('inventoryActivity', []));
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [stockProduct, setStockProduct] = useState(null);
   const [selectedProductIds, setSelectedProductIds] = useState(() => new Set());
@@ -138,39 +117,31 @@ function App() {
 
   // Save products to localStorage whenever they change
   useEffect(() => {
-    try {
-      localStorage.setItem('inventoryProducts', JSON.stringify(products));
-    } catch (error) {
-      console.error('Failed to save products to localStorage:', error);
-    }
+    writeStoredValue('inventoryProducts', products);
   }, [products]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('inventoryActivity', JSON.stringify(activity));
-    } catch (error) {
-      console.error('Failed to save inventory activity:', error);
-    }
+    writeStoredValue('inventoryActivity', activity);
   }, [activity]);
 
   useEffect(() => {
-    localStorage.setItem('inventoryCategories', JSON.stringify(categories));
+    writeStoredValue('inventoryCategories', categories);
   }, [categories]);
 
   useEffect(() => {
-    localStorage.setItem('inventoryLocations', JSON.stringify(locations));
+    writeStoredValue('inventoryLocations', locations);
   }, [locations]);
 
   useEffect(() => {
-    localStorage.setItem('inventorySuppliers', JSON.stringify(suppliers));
+    writeStoredValue('inventorySuppliers', suppliers);
   }, [suppliers]);
 
   useEffect(() => {
-    localStorage.setItem('inventoryMovements', JSON.stringify(movements));
+    writeStoredValue('inventoryMovements', movements);
   }, [movements]);
 
   useEffect(() => {
-    localStorage.setItem('inventoryPurchaseOrders', JSON.stringify(purchaseOrders));
+    writeStoredValue('inventoryPurchaseOrders', purchaseOrders);
   }, [purchaseOrders]);
 
   const recordActivity = (action, product, details) => {
